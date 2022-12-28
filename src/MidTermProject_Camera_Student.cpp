@@ -62,6 +62,13 @@ int main(int argc, const char *argv[])
         // push image into data frame buffer
         DataFrame frame;
         frame.cameraImg = imgGray;
+        // added a ring buffer with fixed size
+        if (dataBuffer.size()> dataBufferSize){
+            // point back to the begin
+            dataBuffer.erase(dataBuffer.begin());
+        }
+
+        dataBuffer.push_back(frame);
         dataBuffer.push_back(frame);
 
         //// EOF STUDENT ASSIGNMENT
@@ -81,6 +88,7 @@ int main(int argc, const char *argv[])
         {
             detKeypointsShiTomasi(keypoints, imgGray, false);
         }
+
         else
         {
             //...
