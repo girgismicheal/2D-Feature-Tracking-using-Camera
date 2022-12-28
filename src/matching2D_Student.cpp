@@ -177,3 +177,81 @@ void detKeypointsHarris(vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool bVis
         cv::waitKey(0);
     }
 }
+
+// modern keypoints detectors implementation
+void detKeypointsModern(vector<cv::KeyPoint> &keypoints, cv::Mat &img, std::string detectorType, bool bVis)
+{
+    cv::Ptr<cv::FeatureDetector> detector;
+
+    if (detectorType.compare("FAST") == 0)
+    {
+        int threshold = 30;
+        bool NMS = true;
+        cv::FastFeatureDetector::DetectorType type = cv::FastFeatureDetector::TYPE_9_16;
+
+        detector = cv::FastFeatureDetector::create(threshold, NMS, type);
+    }
+
+    else if (detectorType.compare("BRISK") == 0)
+    {
+        int threshold = 30;
+        int octaves = 3;
+        float patterScale = 1.0f;
+
+        detector = cv::BRISK::create(threshold, octaves, patterScale);
+    }
+
+    else if (detectorType.compare("ORB") == 0)
+    {
+        int nFeatures = 500;
+        int nLevels = 8;
+        int firstLevel = 0;
+        float scaleFactor = 1.2f;
+        int edgeThreshold = 31;
+        int WTA_K = 2;
+        int patchSize = 31;
+        int fastThreshold = 20;
+
+        cv::ORB::ScoreType scoreType = cv::ORB::HARRIS_SCORE;
+        detector = cv::ORB::create(nFeatures, scaleFactor, nLevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize, fastThreshold);
+    }
+
+    else if (detectorType.compare("AKAZE") == 0)
+    {
+        int descriptorSize = 0;
+        int descriptorChannels = 3;
+        float threshold = 0.001f;
+        int nOctaves = 4;
+        int nOctaveLayers = 4;
+
+        cv::AKAZE::DescriptorType descriptorType = cv::AKAZE::DESCRIPTOR_MLDB;
+        cv::KAZE::DiffusivityType diffusivity = cv::KAZE::DIFF_PM_G2;
+        detector = cv::AKAZE::create(descriptorType, descriptorSize, descriptorChannels, threshold, nOctaves, nOctaveLayers, diffusivity);
+
+    }
+
+    else if (detectorType.compare("SIFT") == 0)
+    {
+        int nFeatures = 0;
+        int nOctaveLayers = 3;
+        double contrastThreshold = 0.04;
+        double edgeThreshold = 10.0;
+        double sigma = 1.6;
+
+        detector = cv::xfeatures2d::SIFT::create(nFeatures, nOctaveLayers, contrastThreshold, edgeThreshold, sigma);
+    }
+
+    double t = (double)cv::getTickCount();
+    detector->detect(img, keypoints);
+    t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
+    cout << detectorType << " detector with n=" << keypoints.size() << " keypoints in " << 1000 * t / 1.0 << " ms" << endl;
+    // visualize results
+    if (bVis)
+    {
+        cv::Mat visImage = img.clone();
+        cv::drawKeypoints(img, keypoints, visImage, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+        cv::namedWindow(detectorType + " Detector Results", 6);
+        imshow(detectorType + " Detector Results", visImage);
+        cv::waitKey(0);
+    }
+ }

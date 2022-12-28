@@ -112,7 +112,85 @@ void detKeypointsHarris(vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool bVis
 ```
 
 2. FAST
+In file 
+```cpp
+else if ((detectorType.compare("FAST") == 0) || (detectorType.compare("BRISK") == 0) || (detectorType.compare("ORB") == 0) || (detectorType.compare("AKAZE") == 0) || (detectorType.compare("SIFT") == 0))
+{
+detKeypointsModern(keypoints, imgGray, detectorType, false);
+}
+```
+In file "matching2D_Student.cpp"
+```cpp
+cv::Ptr<cv::FeatureDetector> detector;
+
+int threshold = 30;
+bool NMS = true;
+
+cv::FastFeatureDetector::DetectorType type = cv::FastFeatureDetector::TYPE_9_16;
+detector = cv::FastFeatureDetector::create(threshold, bNMS, type);
+
+```
 3. BRISK
+
+In file "matching2D_Student.cpp"
+```cpp
+cv::Ptr<cv::FeatureDetector> detector;
+
+int threshold = 30;
+int octaves = 3;
+float patterScale = 1.0f;
+
+detector = cv::BRISK::create(threshold, octaves, patterScale);
+    
+```
 4. ORB
-5. AKAZE 
+
+In file "matching2D_Student.cpp"
+```cpp
+cv::Ptr<cv::FeatureDetector> detector;
+
+int nFeatures = 500;
+int nLevels = 8;
+int firstLevel = 0;
+float scaleFactor = 1.2f;
+int edgeThreshold = 31;
+int WTA_K = 2;
+int patchSize = 31;
+int fastThreshold = 20;
+
+cv::ORB::ScoreType scoreType = cv::ORB::HARRIS_SCORE;
+detector = cv::ORB::create(nFeatures, scaleFactor, nLevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize, fastThreshold);
+
+```
+5. AKAZE
+
+In file "matching2D_Student.cpp"
+```cpp
+cv::Ptr<cv::FeatureDetector> detector;
+
+int descriptorSize = 0;
+int descriptorChannels = 3;
+float threshold = 0.001f;
+int nOctaves = 4;
+int nOctaveLayers = 4;
+
+cv::AKAZE::DescriptorType descriptorType = cv::AKAZE::DESCRIPTOR_MLDB;
+cv::KAZE::DiffusivityType diffusivity = cv::KAZE::DIFF_PM_G2;
+detector = cv::AKAZE::create(descriptorType, descriptorSize, descriptorChannels, threshold, nOctaves, nOctaveLayers, diffusivity);
+
+```
 6. SIFT
+
+In file "matching2D_Student.cpp"
+```cpp
+cv::Ptr<cv::FeatureDetector> detector;
+
+int nFeatures = 0;
+int nOctaveLayers = 3;
+double contrastThreshold = 0.04;
+double edgeThreshold = 10.0;
+double sigma = 1.6;
+
+detector = cv::xfeatures2d::SIFT::create(nFeatures, nOctaveLayers, contrastThreshold, edgeThreshold, sigma);
+
+```
