@@ -48,6 +48,15 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::Key
         matcher->knnMatch(descSource, descRef, knnMatches, k);// Finds the best match for each descriptor in desc1
         t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
         cout << " (KNN) with n=" << knnMatches.size() << " matches in " << 1000 * t / 1.0 << " ms" << endl;
+
+        // use descriptor distance ratio test to remove bad keypoint matches
+        const double ratioThreshold = 0.8f;
+        for (int i = 0; i < knnMatches.size(); i++)
+        {
+            if (knnMatches[i][0].distance<ratioThreshold*knnMatches[i][1].distance)
+            {matches.push_back(knnMatches[i][0]);}
+        }
+        cout << "distance ratio test to remove: " << knnMatches.size() - matches.size() << "keypoints"<< endl;
     }
     else{
         cerr << "#4 : Wrong selectorType - " << endl;

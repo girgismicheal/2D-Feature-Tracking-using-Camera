@@ -209,6 +209,8 @@ for (auto it = keypoints.begin(); it != keypoints.end(); ++it)
 
 ## Task 4: Keypoint Descriptors
 Implement descriptors BRIEF, ORB, FREAK, AKAZE and SIFT and make them selectable by setting a string accordingly.
+In file matching2D_Student.cpp
+
 ```cpp
 // Use one of several types of state-of-art descriptors to uniquely identify keypoints
 void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descriptors, string descriptorType)
@@ -292,7 +294,7 @@ void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descr
 
 ## Task 5: Descriptor Matching
 Implement FLANN matching as well as k-nearest neighbor selection. Both methods must be selectable using the respective strings in the main function.
-
+In file matching2D_Student.cpp
 ```cpp
 // Find best matches for keypoints in two camera images based on several matching methods
 void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::KeyPoint> &kPtsRef, cv::Mat &descSource, cv::Mat &descRef,
@@ -350,6 +352,27 @@ vector<vector<cv::DMatch>> knnMatches;
 
 ## Task 6: Descriptor Distance Ratio
 Use the K-Nearest-Neighbor matching to implement the descriptor distance ratio test, which looks at the ratio of best vs. second-best match to decide whether to keep an associated pair of keypoints.
+In file matching2D_Student.cpp
+```cpp
+else if (selectorType.compare("SEL_KNN") == 0)
+    { // k nearest neighbors (k=2)
+        int k = 2;
+        vector<vector<cv::DMatch>> knnMatches;
+        t = (double)cv::getTickCount();
+        matcher->knnMatch(descSource, descRef, knnMatches, k);// Finds the best match for each descriptor in desc1
+        t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
+        cout << " (KNN) with n=" << knnMatches.size() << " matches in " << 1000 * t / 1.0 << " ms" << endl;
+
+        // use descriptor distance ratio test to remove bad keypoint matches
+        const double ratioThreshold = 0.8f;
+        for (int i = 0; i < knnMatches.size(); i++)
+        {
+            if (knnMatches[i][0].distance<ratioThreshold*knnMatches[i][1].distance)
+            {matches.push_back(knnMatches[i][0]);}
+        }
+        cout << "distance ratio test to remove: " << knnMatches.size() - matches.size() << "keypoints"<< endl;
+    }
+```
 
 ## Task 7: Performance Evaluation 1
 Count the number of keypoints on the preceding vehicle for all 10 images and take note of the distribution of their neighborhood size. Do this for all the detectors you have implemented.
