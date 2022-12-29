@@ -293,6 +293,61 @@ void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descr
 ## Task 5: Descriptor Matching
 Implement FLANN matching as well as k-nearest neighbor selection. Both methods must be selectable using the respective strings in the main function.
 
+```cpp
+// Find best matches for keypoints in two camera images based on several matching methods
+void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::KeyPoint> &kPtsRef, cv::Mat &descSource, cv::Mat &descRef,
+                      std::vector<cv::DMatch> &matches, std::string descriptorType, std::string matcherType, std::string selectorType)
+{
+    // configure matcher
+    bool crossCheck = false;
+    cv::Ptr<cv::DescriptorMatcher> matcher;
+  
+	double t;
+    if (matcherType.compare("MAT_BF") == 0)
+    {
+//         int normType = cv::NORM_HAMMING;
+      	int normType = descriptorType.compare("DES_BINARY") == 0 ? cv::NORM_HAMMING : cv::NORM_L2;
+        matcher = cv::BFMatcher::create(normType, crossCheck);
+      cout << "MAT_BF match (" << descriptorType << ") with cross-check=" << crossCheck;
+    }
+    else if (matcherType.compare("MAT_FLANN") == 0)
+    {
+        if (descSource.type() != CV_32F)
+        {
+            descSource.convertTo(descSource, CV_32F);
+            descRef.convertTo(descRef, CV_32F);
+        }
+        matcher =cv::DescriptorMatcher::create(cv::DescriptorMatcher::FLANNBASED);
+        cout << "MAT_FLANN match";
+    }
+  	else
+    {
+        cerr << "#4 : Wrong matcherType - " << matcherType << endl;
+        exit(-1);
+    }
+
+    // perform matching task
+    if (selectorType.compare("SEL_NN") == 0)
+    { // nearest neighbor (best match)
+		
+        matcher->match(descSource, descRef, matches); // Finds the best match for each descriptor in desc1
+    }
+    else if (selectorType.compare("SEL_KNN") == 0)
+    { // k nearest neighbors (k=2)
+vector<vector<cv::DMatch>> knnMatches;
+        t = (double)cv::getTickCount();
+        matcher->knnMatch(descSource, descRef, knnMatches, 2); // Finds the best match for each descriptor in desc1
+        t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
+        cout << " (KNN) with n=" << knnMatches.size() << " matches in " << 1000 * t / 1.0 << " ms" << endl;
+    }
+    else
+    {
+        cerr << "\n#4 :  Wrong selectorType - " << selectorType << endl;
+        exit(-1);
+    }
+}
+```
+
 ## Task 6: Descriptor Distance Ratio
 Use the K-Nearest-Neighbor matching to implement the descriptor distance ratio test, which looks at the ratio of best vs. second-best match to decide whether to keep an associated pair of keypoints.
 

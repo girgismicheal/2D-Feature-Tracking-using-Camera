@@ -11,26 +11,47 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::Key
     bool crossCheck = false;
     cv::Ptr<cv::DescriptorMatcher> matcher;
 
+    double t
     if (matcherType.compare("MAT_BF") == 0)
     {
-        int normType = cv::NORM_HAMMING;
+//        int normType = cv::NORM_HAMMING;
+        int normType = descriptorCategory.compare("DES_BINARY") == 0 ? cv::NORM_HAMMING : cv::NORM_L2;;
         matcher = cv::BFMatcher::create(normType, crossCheck);
     }
     else if (matcherType.compare("MAT_FLANN") == 0)
     {
-        // ...
+        if (descSource.type() != CV_32F)
+        {
+            descSource.convertTo(descSource, CV_32F);
+            descRef.convertTo(descRef, CV_32F);
+        }
+        matcher = cv::DescriptorMatcher::create(cv::DescriptorMatcher::FLANNBASED);
+        cout << "MAT_FLANN matching"
     }
-
+    else{
+        cerr << "#4 : Wrong matcherType - " << endl;
+        exit(-1);
+    }
     // perform matching task
     if (selectorType.compare("SEL_NN") == 0)
     { // nearest neighbor (best match)
-
+        t = (double)cv::getTickCount();
         matcher->match(descSource, descRef, matches); // Finds the best match for each descriptor in desc1
+        t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
+        cout<< "(SEL_NN) with n=" << matches.size() << " matches in " << 1000 * t / 1.0 << " ms" << endl;
     }
     else if (selectorType.compare("SEL_KNN") == 0)
     { // k nearest neighbors (k=2)
-
-        // ...
+        int k = 2;
+        vector<vector<cv::DMatch>> knnMatches;
+        t = (double)cv::getTickCount();
+        matcher->knnMatch(descSource, descRef, knnMatches, k);// Finds the best match for each descriptor in desc1
+        t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
+        cout << " (KNN) with n=" << knnMatches.size() << " matches in " << 1000 * t / 1.0 << " ms" << endl;
+    }
+    else{
+        cerr << "#4 : Wrong selectorType - " << endl;
+        exit(-1);
     }
 }
 
