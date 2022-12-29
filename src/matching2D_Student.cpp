@@ -103,7 +103,7 @@ void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descr
     }
     else
     {
-        
+
     }
 
     // perform feature description
