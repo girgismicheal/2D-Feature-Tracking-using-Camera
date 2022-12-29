@@ -108,7 +108,14 @@ int main(int argc, const char *argv[])
         cv::Rect vehicleRect(535, 180, 180, 150);
         if (bFocusOnVehicle)
         {
-            // ...
+            vector<cv::KeyPoint> keypointstemp;
+            for (auto it = keypoints.begin(); it != keypoints.end(); ++it)
+            {
+                if (vehicleRect.contains(it->pt))
+                {keypointstemp.push_back(*it);}
+            }
+            keypoints = keypointstemp;
+            cout << detectorType << " detector with n=" << keypoints.size() << " keypoints in the rectangle ROI" << endl;
         }
 
         //// EOF STUDENT ASSIGNMENT

@@ -48,10 +48,62 @@ void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descr
 
         extractor = cv::BRISK::create(threshold, octaves, patternScale);
     }
+    else if (descriptorType.compare("BRIEF") == 0)
+    {
+        int bytes = 32;
+        bool bOrientation = false;
+
+        extractor = cv::xfeatures2d::BriefDescriptorExtractor::create(bytes, bOrientation);
+    }
+    else if (descriptorType.compare("ORB") == 0)
+    {
+        int nFeatures = 500;
+        float scaleFactor = 1.2f;
+        int nLevels = 8;
+        int edgeThreshold = 31;
+        int firstLevel = 0;
+        int WTA_K = 2;
+        cv::ORB::ScoreType scoreType = cv::ORB::HARRIS_SCORE;
+        int patchSize = 31;
+        int fastThreshold = 20;
+
+        extractor = cv::ORB::create(nFeatures, scaleFactor, nLevels, edgeThreshold, firstLevel, WTA_K, scoreType, patchSize, fastThreshold);
+    }
+    else if (descriptorType.compare("FREAK") == 0)
+    {
+        bool orientationNormalized = true;
+        bool scaleNormalized = true;
+        float patternScale = 22.0f;
+        int nOctaves = 4;
+        const std::vector<int> selectedPairs = std::vector<int>();
+
+        extractor = cv::xfeatures2d::FREAK::create(orientationNormalized, scaleNormalized, patternScale, nOctaves, selectedPairs);
+    }
+    else if (descriptorType.compare("AKAZE") == 0)
+    {
+        cv::AKAZE::DescriptorType descriptorType = cv::AKAZE::DESCRIPTOR_MLDB;
+        int descriptorSize = 0;
+        int descriptorChannels = 3;
+        float threshold = 0.001f;
+        int nOctaves = 4;
+        int nOctaveLayers = 4;
+        cv::KAZE::DiffusivityType diffusivity = cv::KAZE::DIFF_PM_G2;
+
+        extractor = cv::AKAZE::create(descriptorType, descriptorSize, descriptorChannels, threshold, nOctaves, nOctaveLayers, diffusivity);
+    }
+    else if (descriptorType.compare("SIFT") == 0)
+    {
+        int nFeatures = 0;
+        int nOctaveLayers = 3;
+        double contrastThreshold = 0.04;
+        double edgeThreshold = 10.0;
+        double sigma = 1.6;
+
+        extractor = cv::xfeatures2d::SIFT::create(nFeatures, nOctaveLayers, contrastThreshold, edgeThreshold, sigma);
+    }
     else
     {
-
-        //...
+        
     }
 
     // perform feature description
