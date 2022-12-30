@@ -28,7 +28,12 @@ int main(int argc, const char *argv[])
     string matcherType = "MAT_BF";        // MAT_BF, MAT_FLANN
     string descriptorCat = "DES_BINARY"; // DES_BINARY, DES_HOG
     string selectorType = "SEL_NN";       // SEL_NN, SEL_KNN
-
+    bool log = true;
+    // output folder
+    if (log)
+    {
+        system("mkdir -p ../output");
+    }
     // data location
     string dataPath = "../";
 
@@ -103,8 +108,15 @@ int main(int argc, const char *argv[])
         {
             //...
         }
-        //// EOF STUDENT ASSIGNMENT
 
+        //// EOF STUDENT ASSIGNMENT
+        std::fstream resultKeypoints;
+        if (bLogging)
+        {
+            resultKeypoints.open("../output/" + detectorType + "-" + descriptorType + "-keypoints.txt", std::ios::app);
+            resultKeypoints << "===>>>" << imgFullFilename << endl;
+            resultKeypoints << "Detected " << keypoints.size() << " keypoints";
+        }
         //// STUDENT ASSIGNMENT
         //// TASK MP.3 -> only keep keypoints on the preceding vehicle
 
