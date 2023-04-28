@@ -1,6 +1,4 @@
-# Sensor-Fusion-Udacity-Nanodegree
-
-## 2D Feature Tracking Project
+# 2D Feature Tracking Project
 
 ### Task 1: The Data Buffer
 As adding new images for infinity doesn't a memory friendly, so we build fixed size buffer with a ring iterator.
